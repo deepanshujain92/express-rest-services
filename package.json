@@ -1,0 +1,13 @@
+{
+    "name": "Phillips_Services",
+    "version": "1.0.0",
+    "keywords": ["util", "functional", "server", "client", "browser"],
+    "author": "Deepanshu Jain",
+    "contributors": [],
+    "dependencies": {
+    "express":"latest",
+    "body-parser":"latest",
+    "mongodb":"latest",
+    "moment":"latest"
+    }
+}
