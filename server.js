@@ -9,7 +9,7 @@ var url = "mongodb://heroku_vxr8k48q:uk3quacbn4u8tk63ungijlmh3n@ds119064.mlab.co
 
 
 function getAuth(authorization, response) {
-    MongoClient.connect(url,{native_parser:true}, function (err, db) {
+    MongoClient.connect(url, {native_parser: true}, function (err, db) {
         if (err)
         {
             var resp = {"message": "Something wrong with database", "success": false};
@@ -89,12 +89,12 @@ function submitMarketIntelligence(authorization, body, response) {
                     "competitor": body.competitor,
                     "comments": body.comments,
                     "attachment": body.attachment,
-                    "createdDate":new Date(),
+                    "createdDate": new Date(),
                     "reportedBy": {
                         "name": result[0].firstName + " " + result[0].lastName,
                         "username": result[0].username,
-                        "agency":result[0].agency
-                        
+                        "agency": result[0].agency
+
                     }});
                 response.status(200);
                 response.send({"status": "success", "data": "successfully submitted"});
@@ -105,6 +105,87 @@ function submitMarketIntelligence(authorization, body, response) {
             ;
             response.send(orders);
             db.close();
+        });
+    });
+
+}
+function createUser(authorization, body, response) {
+    MongoClient.connect(url, function (err, db) {
+        if (err)
+        {
+            var resp = {"message": "Something wrong with database", "success": false};
+            return resp;
+            //db.close();
+        }
+
+        var auth = authorization;
+        if (auth)
+            auth = auth.split(" ");
+        auth = new Buffer.from(auth[1], 'base64').toString('utf8');
+        console.log(auth);
+        var authArray = auth.split(":");
+        console.log(authArray);
+        var username = authArray[0];
+        var password = authArray[1];
+        var filter = {"username": username.toLowerCase(), "password": password};
+        console.log(filter);
+        db.collection("users").find(filter, {password: 0, _id: 0}).toArray(function (err, result) {
+            if (err)
+            {
+                throw err;
+                var orders = {"data": [{"message": "Something wrong with database"}], "success": true};
+                response.status(500);
+                response.send(orders);
+                db.close();
+            }
+
+
+            console.log(result);
+            if (result.length === 1 && result[0].role === 'admin') {
+                db.collection("users").find({email: body.email}, {password: 0, _id: 0}).toArray(function (err, ifUserExist) {
+                    if (err)
+                    {
+                        throw err;
+                        var orders = {"data": [{"message": "Something wrong with database"}], "success": true};
+                        response.status(500);
+                        response.send(orders);
+                        db.close();
+                    }
+                    if (ifUserExist.length === 0)
+                    {
+                        db.collection("users").insert({
+                            "firstName": body.firstName,
+                            "lastName": body.lastName,
+                            "email": body.email,
+                            "password": body.password,
+                            "role": body.role,
+                            "createdDate": new Date(),
+                            "createdBy": {
+                                "name": result[0].firstName + " " + result[0].lastName,
+                                "username": result[0].username,
+                                "agency": result[0].agency
+
+                            },
+                            "isActive": false
+                        });
+                        response.status(200);
+                        response.send({"status": "success", "data": "user created successfully"});
+                    } else {
+                        response.status(200);
+                        response.send({"status": "error", "message": "user already exist with same email"});
+                    }
+                    ;
+                    ;
+                    response.send(orders);
+                    db.close();
+                });
+            } else
+            {
+                response.status(401);
+                response.send({"status": "error", "message": "user creation failed"});
+            }
+            ;
+
         });
     });
 
@@ -146,12 +227,12 @@ function submitIdea(authorization, body, response) {
                     "productname": body.productName,
                     "referencecustomer": body.referenceCustomer,
                     "attachment": body.attachment,
-                    "comments" : body.comments,
-                    "createdDate":new Date(),
+                    "comments": body.comments,
+                    "createdDate": new Date(),
                     "reportedBy": {
                         "name": result[0].firstName + " " + result[0].lastName,
                         "username": result[0].username,
-                        "agency":result[0].agency
+                        "agency": result[0].agency
                     }});
                 response.status(200);
                 response.send({"status": "success", "data": "successfully submitted"});
@@ -220,7 +301,8 @@ function getMarketIntelligence(authorization, body, response) {
                     response.send(responseData);
                     db.close();
                 });
-            };
+            }
+            ;
 
         });
     });
@@ -281,7 +363,8 @@ function getIdea(authorization, body, response) {
                     response.send(responseData);
                     db.close();
                 });
-            };
+            }
+            ;
 
         });
     });
@@ -304,7 +387,7 @@ app.post('/philips/api/getMarketIntelligence', function (request, response) {
     var authorization = request.headers.authorization;
     if (authorization !== "" && authorization !== undefined)
     {
-        getMarketIntelligence(authorization,request.body, response);
+        getMarketIntelligence(authorization, request.body, response);
     } else
     {
         response.status(401);
@@ -316,7 +399,7 @@ app.post('/philips/api/getIdea', function (request, response) {
     var authorization = request.headers.authorization;
     if (authorization !== "" && authorization !== undefined)
     {
-        getIdea(authorization,request.body, response);
+        getIdea(authorization, request.body, response);
     } else
     {
         response.status(401);
@@ -325,7 +408,7 @@ app.post('/philips/api/getIdea', function (request, response) {
 });
 app.post('/philips/api/submitMarketIntelligence', function (request, response) {
     console.log('/philips/api/submitMarketIntelligence');
-    var authorization = request.headers.authorization||request.headers.Authorization;
+    var authorization = request.headers.authorization || request.headers.Authorization;
     if (authorization !== "" && authorization !== undefined)
     {
         submitMarketIntelligence(authorization, request.body, response);
@@ -337,10 +420,22 @@ app.post('/philips/api/submitMarketIntelligence', function (request, response) {
 });
 app.post('/philips/api/submitIdea', function (request, response) {
     console.log('/philips/api/submitIdea');
-    var authorization = request.headers.authorization||request.headers.Authorization;
+    var authorization = request.headers.authorization || request.headers.Authorization;
     if (authorization !== "" && authorization !== undefined)
     {
         submitIdea(authorization, request.body, response);
+    } else
+    {
+        response.status(401);
+        response.send({"status": "error", "message": "missing credentials"});
+    }
+});
+app.post('/philips/api/createUser', function (request, response) {
+    console.log('/philips/api/createUser');
+    var authorization = request.headers.authorization || request.headers.Authorization;
+    if (authorization !== "" && authorization !== undefined)
+    {
+        createUser(authorization, request.body, response);
     } else
     {
         response.status(401);
