@@ -223,7 +223,7 @@ function submitIdea(authorization, body, response) {
 
             console.log(result);
             if (result.length === 1) {
-                db.collection("feedback").insert({"productfamily": body.productFamily,
+                db.collection("feedback").insert({"productfamily": body.productFamily,"productType":body.productType,
                     "productname": body.productName,
                     "referencecustomer": body.referenceCustomer,
                     "attachment": body.attachment,
