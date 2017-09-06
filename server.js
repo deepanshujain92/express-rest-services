@@ -6,7 +6,7 @@ var nodemailer = require('nodemailer');
 var app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-var MongoClient = require("mongodb").MongoCclient;
+var MongoClient = require("mongodb").MongoClient;
 var url = "mongodb://heroku_vxr8k48q:uk3quacbn4u8tk63ungijlmh3n@ds119064.mlab.com:19064/heroku_vxr8k48q";
 
 
