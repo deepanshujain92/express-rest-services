@@ -1,10 +1,12 @@
 var express = require("express");
 var bodyParser = require('body-parser');
+var nodemailer = require('nodemailer');
+
 
 var app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-var MongoClient = require("mongodb").MongoClient;
+var MongoClient = require("mongodb").MongoCclient;
 var url = "mongodb://heroku_vxr8k48q:uk3quacbn4u8tk63ungijlmh3n@ds119064.mlab.com:19064/heroku_vxr8k48q";
 
 
@@ -166,8 +168,9 @@ function createUser(authorization, body, response) {
                                 "agency": result[0].agency
 
                             },
-                            "isActive": false
+                            "isActive": body.isActive
                         });
+                        sendEmail(body.role,body.email,body.password);
                         response.status(200);
                         response.send({"status": "success", "data": "user created successfully"});
                     } else {
@@ -188,6 +191,30 @@ function createUser(authorization, body, response) {
 
         });
     });
+
+}
+function sendEmail(role,to,password)
+{
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'javageekscode@gmail.com',
+    pass: 'lyckrs@123'
+  }
+});
+
+var mailOptions = {
+  to: to,
+  subject: 'Registration - Philips Admin',
+  text: 'Admin has registered you '+to+ ' as '+role+' and password is '+password
+};
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+});
 
 }
 function submitIdea(authorization, body, response) {
