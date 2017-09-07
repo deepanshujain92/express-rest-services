@@ -1,12 +1,12 @@
 var express = require("express");
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
+var MongoClient = require("mongodb").MongoClient;
 
 
 var app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-var MongoClient = require("mongodb").MongoClient;
 var url = "mongodb://heroku_vxr8k48q:uk3quacbn4u8tk63ungijlmh3n@ds119064.mlab.com:19064/heroku_vxr8k48q";
 
 
@@ -371,7 +371,7 @@ function getIdea(authorization, body, response) {
                 var productfamily = body.productFamily;
                 var productname = body.productName;
                 var referencecustomer = body.referenceCustomer;
-
+                var productType = body.productType;
 
 
                 var query = {};
@@ -382,6 +382,8 @@ function getIdea(authorization, body, response) {
                     query.productname = productname;
                 if (referencecustomer !== null && referencecustomer !== undefined && referencecustomer !== '')
                     query.referencecustomer = referencecustomer;
+                if (productType !== null && productType !== undefined && productType !== '')
+                    query.productType = productType;
                 console.log(query);
                 db.collection("feedback").find(query).toArray(function (err, result) {
                     if (err)
