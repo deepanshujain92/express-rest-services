@@ -382,7 +382,7 @@ function getIdea(authorization, body, response) {
                     query.productname = productname;
                 if (referencecustomer !== null && referencecustomer !== undefined && referencecustomer !== '')
                     query.referencecustomer = referencecustomer;
-                if (productType !== null && productType !== undefined && productType !== '')
+                if (productType !== null && productType !== undefined && productType !== '' && productType !== 'All')
                     query.productType = productType;
                 console.log(query);
                 db.collection("feedback").find(query).toArray(function (err, result) {
