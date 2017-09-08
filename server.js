@@ -172,7 +172,7 @@ function createUser(authorization, body, response) {
                         });
                         sendEmail(body.role,body.email,body.password);
                         response.status(200);
-                        response.send({"status": "success", "data": "user created successfully"});
+                        response.send({"status": "success", "message": "user created successfully"});
                     } else {
                         response.status(200);
                         response.send({"status": "error", "message": "user already exist with same email"});
