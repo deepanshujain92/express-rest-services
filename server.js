@@ -170,7 +170,7 @@ function createUser(authorization, body, response) {
                             },
                             "isActive": body.isActive
                         });
-                        sendEmail(body.role,body.email,body.password);
+                        sendEmail(body.role, body.email, body.password);
                         response.status(200);
                         response.send({"status": "success", "message": "user created successfully"});
                     } else {
@@ -193,28 +193,28 @@ function createUser(authorization, body, response) {
     });
 
 }
-function sendEmail(role,to,password)
+function sendEmail(role, to, password)
 {
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'javageekscode@gmail.com',
-    pass: 'lyckrs@123'
-  }
-});
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'javageekscode@gmail.com',
+            pass: 'lyckrs@123'
+        }
+    });
 
-var mailOptions = {
-  to: to,
-  subject: 'Registration - Philips Admin',
-  text: 'Admin has registered you '+to+ ' as '+role+' and password is '+password
-};
-transporter.sendMail(mailOptions, function(error, info){
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email sent: ' + info.response);
-  }
-});
+    var mailOptions = {
+        to: to,
+        subject: 'Registration - Philips Admin',
+        text: 'Admin has registered you ' + to + ' as ' + role + ' and password is ' + password
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
 
 }
 function submitIdea(authorization, body, response) {
@@ -250,7 +250,7 @@ function submitIdea(authorization, body, response) {
 
             console.log(result);
             if (result.length === 1) {
-                db.collection("feedback").insert({"productfamily": body.productFamily,"productType":body.productType,
+                db.collection("feedback").insert({"productfamily": body.productFamily, "productType": body.productType,
                     "productname": body.productName,
                     "referencecustomer": body.referenceCustomer,
                     "attachment": body.attachment,
@@ -372,10 +372,13 @@ function getIdea(authorization, body, response) {
                 var productname = body.productName;
                 var referencecustomer = body.referenceCustomer;
                 var productType = body.productType;
+                var createdBy = body.createdBy;
+
 
 
                 var query = {};
-
+                if (createdBy)
+                  query = {"reportedBy.username" : result[0].username};
                 if (productfamily !== null && productfamily !== undefined && productfamily !== '')
                     query.productfamily = productfamily;
                 if (productname !== null && productname !== undefined && productname !== '')
